@@ -26,8 +26,8 @@ new features on that branch (or a `switch2-pro2-xxx` branch cut from it), then r
    rewrites the commit hashes.
 4. After syncing, rebuild before claiming "latest": source changes do not change the
    installed app until `rebuild-totk.sh` runs. Built apps go to
-   `/Volumes/PortableSSD/MacNative/output/`; `output-sw2/` holds only the helper scripts
-   and the patch bundle.
+   `/Volumes/PortableSSD/MacNative/output/`; the helper scripts live in `tools/switch2/` and the
+   patch bundle in `output/`.
 5. The work tree (`/Volumes/PortableSSD/MacNative/MacNativeGames-work/totk143/totk`) holds
    copies, not symlinks. Edit `shared/runtime` in the checkout, then copy into the work
    tree (or rerun `build_app.py`) before `make`.
@@ -41,12 +41,12 @@ new features on that branch (or a `switch2-pro2-xxx` branch cut from it), then r
 
 ```sh
 # sync upstream -> main -> rebase our commits -> push fork (stops on conflict)
-/Volumes/PortableSSD/MacNative/output-sw2/sync.sh
+/Volumes/PortableSSD/MacNative/MacNativeGames/tools/switch2/sync.sh
 
 # rebuild the TotK 1.4.3 app from the current checkout (~10 min, ad-hoc signed)
-/Volumes/PortableSSD/MacNative/output-sw2/rebuild-totk.sh
+/Volumes/PortableSSD/MacNative/MacNativeGames/tools/switch2/rebuild-totk.sh
 # rebuild the BotW 1.9.0 app the same way
-/Volumes/PortableSSD/MacNative/output-sw2/rebuild-botw.sh
+/Volumes/PortableSSD/MacNative/MacNativeGames/tools/switch2/rebuild-botw.sh
 
 # after a manual relink, install the binary into the app and re-sign:
 #   cp build/totk-native-v143 "<app>/Contents/MacOS/TOTK"
@@ -94,13 +94,13 @@ The feature is one commit; replay it from the patch instead:
 ```sh
 git switch main && git fetch upstream && git merge --ff-only upstream/main
 git switch -c switch2-pro2-replay
-git apply --3way /Volumes/PortableSSD/MacNative/output-sw2/sw2-pro2.patch
+git apply --3way /Volumes/PortableSSD/MacNative/output/sw2-pro2.patch
 ```
 
 Regenerate the bundle after changing the branch:
 
 ```sh
-git diff main..switch2-pro2 > /Volumes/PortableSSD/MacNative/output-sw2/sw2-pro2.patch
+git diff main..switch2-pro2 > /Volumes/PortableSSD/MacNative/output/sw2-pro2.patch
 ```
 
 ## Known gaps
