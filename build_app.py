@@ -2544,6 +2544,9 @@ def step_app(tree, out, logs, *, version="v0", game='totk', game_data='app', gam
                 CFBundleVersion=str(expected['version'] + 1), LSMinimumSystemVersion='26.0', NSHighResolutionCapable=True,
                 LSApplicationCategoryType='public.app-category.action-games', LSSupportsGameMode=True,
                 GCSupportsControllerUserInteraction=True,
+                # The runtime's Bluetooth LE Switch 2 Pro Controller support (shared/runtime/switch2): without the key the
+                # runtime leaves Bluetooth off, and a controller paired over it is invisible to the game.
+                NSBluetoothAlwaysUsageDescription='Switch 2 controllers connect to the game over Bluetooth.',
                 CFBundleLocalizations=list(GAME_LANGUAGES) + (['pt-BR'] if version in ('v143', 'botw190') else []))
     icon = tree / 'build/AppIcon.icns'
     if icon.exists():

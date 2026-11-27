@@ -28,6 +28,10 @@
 #include <string.h>
 #include "runtime.h"
 #include "feedback_settings.h"
+#include "switch2_ble.h"   // the optional Bluetooth LE Pro Controller 2 (shared/runtime/switch2)
+
+/* Absent from builds that do not compile switch2_ble.m: call it only when the link found it. */
+extern void switch2_rumble(int side, float amp_low, float freq_low, float amp_high, float freq_high) __attribute__((weak_import));
 
 #import <CoreHaptics/CoreHaptics.h>
 
@@ -71,6 +75,7 @@ void runtime_rumble_set(unsigned side, float al, float fl, float ah, float fh) {
     want[side][0] = al; want[side][1] = fl; want[side][2] = ah; want[side][3] = fh; wantAt[side] = runtime_now_ns(); wantCount++;
     float a = al > ah ? al : ah; if (a > strongest) strongest = a;
     pthread_mutex_unlock(&wantLock);
+    if (switch2_rumble) switch2_rumble((int)side, al, fl, ah, fh);   /* straight to a Bluetooth LE Pro Controller 2, when one is on */
     if (a > 0.02f && rumbleQueue && atomic_load_explicit(&rumbleSlow, memory_order_relaxed)) {
         atomic_store_explicit(&rumbleSlow, 0, memory_order_relaxed);
         dispatch_async(rumbleQueue, ^{

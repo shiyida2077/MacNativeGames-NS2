@@ -21,6 +21,10 @@
 #endif
 #include "switch_left_fallback.h"
 #include "dsu_client.h"
+#if TARGET_OS_OSX
+/* The optional Bluetooth LE Pro Controller 2 (switch2_ble.m): absent from builds that do not compile it. */
+extern int switch2_pad_present(void) __attribute__((weak_import));
+#endif
 
 /* ---- the game's hooks (runtime/gamepad_game.h); a group it leaves out does nothing ---- */
 #ifndef GAMEPAD_MOUSE_MODE
@@ -427,6 +431,7 @@ int runtime_gamepad_type(int *detected) {
         if (controller.extendedGamepad) { found = gamepad_type_detect(controller.productCategory.UTF8String, controller.vendorName.UTF8String); break; }
 #if TARGET_OS_OSX
     if (found < 0 && hidPad.present) found = GAMEPAD_TYPE_SWITCH;   /* the generic HID pads are Switch-style */
+    if (found < 0 && switch2_pad_present && switch2_pad_present()) found = GAMEPAD_TYPE_SWITCH;   /* Pro Controller 2 over Bluetooth */
 #endif
     if (detected) *detected = found;
     return atomic_load(&controllerType);

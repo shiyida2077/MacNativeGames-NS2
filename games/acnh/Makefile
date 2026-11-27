@@ -54,7 +54,7 @@ $(OUT)/acnh-native: $(RUNTIME_SRC) $(RUNTIME_HEADERS) $(GENERATED) $(GFX_OBJECTS
 	  $(VORBIS_PREFIX)/lib/libvorbis.a $(OGG_PREFIX)/lib/libogg.a \
 	  -framework Metal -framework MetalFX -framework Foundation -framework QuartzCore -framework ImageIO -framework CoreGraphics \
 	  -framework CoreText -framework UniformTypeIdentifiers -fobjc-arc -framework Cocoa -framework CoreVideo -framework CoreFoundation \
-	  -framework AudioToolbox -framework GameController -framework CoreHaptics -framework IOKit -framework VideoToolbox -framework CoreMedia -o "$@"
+	  -framework AudioToolbox -framework GameController -framework CoreHaptics -framework IOKit -framework CoreBluetooth -framework IOBluetooth -framework VideoToolbox -framework CoreMedia -o "$@"
 
 clean:
 	rm -rf "$(OUT)/obj" "$(OUT)/acnh-native"

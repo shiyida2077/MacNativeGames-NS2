@@ -17,6 +17,13 @@
 #include "runtime.h"
 #include "gamepad_layout.h"   // face buttons by position (PlayStation, Xbox) or label (Nintendo)
 #include "controller_map.h"   // the player's button layout (controls.txt)
+#include "switch2_ble.h"   // the optional Bluetooth LE Pro Controller 2 (shared/runtime/switch2; see switch2_ble.m)
+
+/* Both are absent from builds that do not compile switch2_ble.m (games/acnh and games/eow at first): call them only
+   when the link found them. */
+extern int switch2_start(void) __attribute__((weak_import));
+extern int switch2_pad_state(Switch2Pad *out) __attribute__((weak_import));
+extern void switch2_set_input_hook(void (*hook)(void)) __attribute__((weak_import));
 
 static pthread_mutex_t gamepadLock = PTHREAD_MUTEX_INITIALIZER;
 static RuntimeGamepadState gamepadState;
@@ -46,6 +53,13 @@ static void gamepad_mapping_reset(void) {   /* main thread */
 }
 
 static void refresh_gamepads(void) {
+    if (switch2_start) {
+        /* The Bluetooth reports have no GameController callback: the transport calls this hook when one arrives, and the
+           first frame registers it. Both the start and the hook are absent from builds without switch2_ble.m. */
+        static int hook_set;
+        if (!hook_set) { hook_set = 1; if (switch2_set_input_hook) switch2_set_input_hook(refresh_gamepads); }
+        switch2_start();   /* idempotent: the first frame starts the Bluetooth scan, if the build has it */
+    }
 #if TARGET_OS_OSX
     /* The raw HID fallback must obey the same focus policy as GameController. Do not latch background presses. */
     if (!atomic_load(&gamepadFocused) && !runtime_gamepad_background_enabled()) {
@@ -103,6 +117,19 @@ static void refresh_gamepads(void) {
         next.ly = stronger_axis(next.ly, hidPad.ly);
         next.rx = stronger_axis(next.rx, hidPad.rx);
         next.ry = stronger_axis(next.ry, hidPad.ry);
+    }
+    /* A Switch 2 Pro Controller 2 over Bluetooth LE (shared/runtime/switch2): its own buttons and sticks join the rest,
+       taken as physical input; the rumble path is gamepad_feedback.m's. */
+    Switch2Pad sw2;
+    if (switch2_pad_state && switch2_pad_state(&sw2) && sw2.present) {
+        const float axes[] = {sw2.lx / 32767.f, sw2.ly / 32767.f, sw2.rx / 32767.f, sw2.ry / 32767.f};
+        gamepad_game_hid_input(sw2.buttons, axes);   /* the prompts follow it as they do a generic Switch-style HID pad */
+        next.connected = 1;
+        physical |= sw2.buttons & CONTROLLER_OWN_BUTTONS;
+        next.lx = stronger_axis(next.lx, sw2.lx);
+        next.ly = stronger_axis(next.ly, sw2.ly);
+        next.rx = stronger_axis(next.rx, sw2.rx);
+        next.ry = stronger_axis(next.ry, sw2.ry);
     }
 #if TARGET_OS_OSX
     /* A DSU server's pad (dsu_client.h): its buttons (the physical order, controller_map.h) and sticks join the controllers'. */

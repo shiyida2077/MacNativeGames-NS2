@@ -48,7 +48,7 @@ $(OUT)/eow-native: $(RUNTIME_SRC) $(RUNTIME_HEADERS) $(GENERATED) $(GFX_OBJECTS)
 	  $(RUNTIME_SRC) $(GFX_OBJECTS) $(OPUS_PREFIX)/lib/libopus.a $(VPX_PREFIX)/lib/libvpx.a \
 	  -framework Metal -framework MetalFX -framework Foundation -framework QuartzCore -framework ImageIO -framework CoreGraphics \
 	  -framework CoreText -framework UniformTypeIdentifiers -fobjc-arc -framework Cocoa -framework CoreVideo -framework CoreFoundation \
-	  -framework AudioToolbox -framework GameController -framework CoreHaptics -framework IOKit -o "$@"
+	  -framework AudioToolbox -framework GameController -framework CoreHaptics -framework IOKit -framework CoreBluetooth -framework IOBluetooth -o "$@"
 
 runtime: $(OUT)/eow-native
 
