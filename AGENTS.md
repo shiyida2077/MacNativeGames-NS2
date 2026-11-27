@@ -25,7 +25,9 @@ new features on that branch (or a `switch2-pro2-xxx` branch cut from it), then r
 3. Push the feature branch with `--force-with-lease`, never bare `--force`. Rebasing
    rewrites the commit hashes.
 4. After syncing, rebuild before claiming "latest": source changes do not change the
-   installed app until `rebuild-totk.sh` runs.
+   installed app until `rebuild-totk.sh` runs. Built apps go to
+   `/Volumes/PortableSSD/MacNative/output/`; `output-sw2/` holds only the helper scripts
+   and the patch bundle.
 5. The work tree (`/Volumes/PortableSSD/MacNative/MacNativeGames-work/totk143/totk`) holds
    copies, not symlinks. Edit `shared/runtime` in the checkout, then copy into the work
    tree (or rerun `build_app.py`) before `make`.
@@ -43,6 +45,8 @@ new features on that branch (or a `switch2-pro2-xxx` branch cut from it), then r
 
 # rebuild the TotK 1.4.3 app from the current checkout (~10 min, ad-hoc signed)
 /Volumes/PortableSSD/MacNative/output-sw2/rebuild-totk.sh
+# rebuild the BotW 1.9.0 app the same way
+/Volumes/PortableSSD/MacNative/output-sw2/rebuild-botw.sh
 
 # after a manual relink, install the binary into the app and re-sign:
 #   cp build/totk-native-v143 "<app>/Contents/MacOS/TOTK"
@@ -58,7 +62,7 @@ new features on that branch (or a `switch2-pro2-xxx` branch cut from it), then r
 git rev-list --count main..upstream/main     # 0 = main is current
 git log --oneline -1 switch2-pro2            # our commits on top
 git status --short                            # only .workbuddy/ and backup/ may appear
-ls -l "/Volumes/PortableSSD/MacNative/output-sw2/Tears of the Kingdom 1.4.3 SW2.app/Contents/MacOS/TOTK"
+ls -l "/Volumes/PortableSSD/MacNative/output/Tears of the Kingdom 1.4.3.app/Contents/MacOS/TOTK"
 # the binary's timestamp must be later than the last rebuild/relink
 ```
 
